@@ -1,7 +1,7 @@
-variable "ns" {
-  description = "Namespace environment"
-  type        = string
-}
+#variable "ns" {
+#  description = "Namespace environment"
+#  type        = string
+#}
 
 
 variable "kubedeploy" {
