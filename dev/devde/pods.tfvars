@@ -1,7 +1,7 @@
-kubedeploy = "nginx-brothe"
+kubedeploy = "nginx-iac"
 img-app    = "nginx"
-port	   = 8080
+port	   = 80
 
 # readiness probe
   # request
-cpu-req="17m"
+cpu-req="25m"
