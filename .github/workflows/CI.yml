@@ -20,7 +20,7 @@ jobs:
       - name: 🧭 Set K3s context
         run: |
           echo "🧭 Setting Kubernetes context ke K3s lokal..."
-          kubectl config use-context k3s || {
+          kubectl config use-context default || {
             echo "❌ Context k3s tidak ditemukan di kubeconfig!"
             kubectl config get-contexts
             exit 1
