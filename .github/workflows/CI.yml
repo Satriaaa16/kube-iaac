@@ -17,6 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 🧭 Set K3s context
+        run: |
+          echo "🧭 Setting Kubernetes context ke K3s lokal..."
+          kubectl config use-context k3s || {
+            echo "❌ Context k3s tidak ditemukan di kubeconfig!"
+            kubectl config get-contexts
+            exit 1
+          }
+          echo "✅ Context aktif:"
+          kubectl config current-context
+
       - name: ⚙️ Init & Plan
         working-directory: ./dev/excute
         run: |
@@ -34,6 +45,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: 🧭 Set K3s context
+        run: |
+          echo "🧭 Setting Kubernetes context ke K3s lokal..."
+          kubectl config use-context k3s || {
+            echo "❌ Context k3s tidak ditemukan di kubeconfig!"
+            kubectl config get-contexts
+            exit 1
+          }
+          echo "✅ Context aktif:"
+          kubectl config current-context
 
       - name: ⚙️ Init & Plan Ulang
         working-directory: ./dev/excute
