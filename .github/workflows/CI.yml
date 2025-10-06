@@ -8,35 +8,48 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
+
+    env:
+      KUBECONFIG: /home/alan/.kube/config   # sesuaikan lokasi kubeconfig kamu
 
     steps:
-      - name: Checkout repository
+      - name: 🧩 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install OpenTofu
+      - name: 🧠 Verify OpenTofu installation
         run: |
-          curl -fsSL https://get.opentofu.org/install.sh | bash
+          if ! command -v tofu &> /dev/null; then
+            echo "❌ OpenTofu tidak ditemukan! Install dulu via 'sudo pacman -S opentofu'"
+            exit 1
+          fi
           tofu version
 
-      - name: Install kubectl & K3d (for local K3s)
+      - name: 🧠 Verify Kubernetes connection
         run: |
-          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
-          k3d cluster create local-cluster --wait
-          kubectl cluster-info
+          if ! kubectl cluster-info &> /dev/null; then
+            echo "❌ Tidak bisa terhubung ke cluster K3s!"
+            exit 1
+          fi
+          kubectl get nodes
 
-      - name: Setup KUBECONFIG
+      - name: ⚙️ Terraform Init
+        working-directory: ./dev/module
         run: |
-          mkdir -p ~/.kube
-          k3d kubeconfig get local-cluster > ~/.kube/config
+          tofu init -input=false
 
-      - name: Terraform Init & Apply
-        working-directory: ./dev/excute
+      - name: 🧩 Terraform Plan
+        working-directory: ./dev/module
         run: |
-          tofu init
-          tofu apply -auto-approve -var-file=../devde/main.tfvars
+          tofu plan -var-file=../devde/main.tfvars -out=tfplan
 
-      - name: Verify Deployment
+      - name: 🚀 Terraform Apply
+        if: success()
+        working-directory: ./dev/module
+        run: |
+          tofu apply -auto-approve tfplan
+
+      - name: ✅ Verify Deployment
         run: |
           kubectl get ns
           kubectl get pods -A
