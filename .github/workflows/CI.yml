@@ -49,7 +49,7 @@ jobs:
 
       - name: 🚀 Terraform Apply
         if: success()
-        working-directory: ./dev/excute
+        working-directory: ./dev/module     # ← HARUS sama dengan folder tempat tfplan dibuat
         run: |
           echo "🚀 Menjalankan tofu apply..."
           tofu apply -auto-approve tfplan || {
@@ -57,7 +57,7 @@ jobs:
           }
 
       - name: ✅ Verify Deployment
-        continue-on-error: true   # supaya gak fail meskipun error minor
+        continue-on-error: true
         run: |
           echo "🔍 Mengecek namespace dan pods..."
 
