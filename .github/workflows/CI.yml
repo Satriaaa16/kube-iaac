@@ -27,16 +27,18 @@ jobs:
           kubectl get nodes
 
       - name: ⚙️ Terraform Init
-        working-directory: ./dev/module
+        working-directory: ./dev/excute
         run: tofu init -input=false
 
       - name: 🧩 Terraform Plan
-        working-directory: ./dev/module
+        working-directory: ./dev/excute
         run: |
-          tofu plan \
-            -var-file="../devde/ns.tfvars" \
+          echo "📋 Menjalankan tofu plan..."
+          tofu plan -input=false \
             -var-file="../devde/pods.tfvars" \
             -out=tfplan
+          echo "✅ Plan selesai — lihat hasil di log di atas."
+
 
   apply:
     name: 🚀 Terraform Apply (Merge to main)
@@ -49,14 +51,15 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: ⚙️ Terraform Init
-        working-directory: ./dev/module
+        working-directory: ./dev/excute
         run: tofu init -input=false
 
       - name: 🚀 Terraform Apply
-        working-directory: ./dev/module
+        working-directory: ./dev/excute
         run: |
-          tofu apply -auto-approve tfplan || {
-            echo "⚠️ Resource sudah ada — lanjut..."
+          echo "🚀 Menjalankan tofu apply..."
+          tofu apply -auto-approve -input=false tfplan || {
+            echo "⚠️ Resource sudah ada — lanjutkan deployment..."
           }
 
       - name: ✅ Verify Deployment
@@ -64,5 +67,7 @@ jobs:
         run: |
           echo "🔍 Mengecek namespace dan pods..."
           kubectl get ns
+          echo ""
           kubectl get pods -A
+          echo ""
           echo "✅ Verifikasi selesai!"
