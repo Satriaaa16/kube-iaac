@@ -41,7 +41,10 @@ jobs:
       - name: 🧩 Terraform Plan
         working-directory: ./dev/module
         run: |
-          tofu plan -var-file=../devde/main.tfvars -out=tfplan
+          tofu plan \
+            -var-file="../devde/ns.tfvars" \
+            -var-file="../devde/pods.tfvars" \
+            -out=tfplan
 
       - name: 🚀 Terraform Apply
         if: success()
