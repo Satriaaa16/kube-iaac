@@ -1,4 +1,4 @@
-kubedeploy = "walawe-1"
+kubedeploy = "nginx-brothe"
 img-app    = "nginx"
 port	   = 8080
 
