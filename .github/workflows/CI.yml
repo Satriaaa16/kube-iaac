@@ -49,7 +49,7 @@ jobs:
 
       - name: 🚀 Terraform Apply
         if: success()
-        working-directory: ./dev/module
+        working-directory: ./dev/excute
         run: |
           echo "🚀 Menjalankan tofu apply..."
           tofu apply -auto-approve tfplan || {
