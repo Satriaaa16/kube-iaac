@@ -4,4 +4,4 @@ port	   = 8080
 
 # readiness probe
   # request
-cpu-req="15m"
+cpu-req="17m"
