@@ -1,6 +1,6 @@
 module "config-utama" {
  source = "../module/"
- ns	  = var.ns
+# ns	  = var.ns
  
  kubedeploy = var.kubedeploy
    labels = var.labels

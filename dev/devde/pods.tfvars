@@ -1,4 +1,4 @@
-kubedeploy = "walawe-edit"
+kubedeploy = "walawe-1"
 img-app    = "nginx"
 port	   = 8080
 
