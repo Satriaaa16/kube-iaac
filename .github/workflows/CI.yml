@@ -2,9 +2,9 @@ name: Terraform + K3s CI/CD
 
 on:
   push:
-    branches: [ "main" ]         # Apply hanya saat merge ke main
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "testing" ]  # Plan saat PR ke main atau testing
+    branches: [ "main", "testing" ]
 
 jobs:
   plan:
@@ -17,34 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 🧠 Verify OpenTofu
-        run: tofu version
-
-      - name: 🧠 Verify Kubernetes
-        run: |
-          echo "🔍 Mengecek koneksi ke cluster K3s..."
-          kubectl cluster-info
-          kubectl get nodes
-
-      - name: ⚙️ Terraform Init
-        working-directory: ./dev/excute
-        run: tofu init -input=false
-
-      - name: 🧩 Terraform Plan
+      - name: ⚙️ Init & Plan
         working-directory: ./dev/excute
         run: |
-          echo "📋 Menjalankan tofu plan..."
+          tofu init -input=false
           tofu plan -input=false \
             -var-file="../devde/pods.tfvars" \
             -out=tfplan
-          echo "✅ Plan selesai — lihat hasil di log di atas."
-
-      - name: 💾 Upload tfplan artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan
-          path: ./dev/excute/tfplan
-
 
   apply:
     name: 🚀 Terraform Apply (Merge to main)
@@ -56,30 +35,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 💾 Download tfplan artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan
-          path: ./dev/excute
-
-      - name: ⚙️ Terraform Init
-        working-directory: ./dev/excute
-        run: tofu init -input=false
-
-      - name: 🚀 Terraform Apply
+      - name: ⚙️ Init & Plan Ulang
         working-directory: ./dev/excute
         run: |
-          echo "🚀 Menjalankan tofu apply..."
-          tofu apply -auto-approve -input=false tfplan || {
+          tofu init -input=false
+          tofu plan -input=false \
+            -var-file="../devde/pods.tfvars" \
+            -out=tfplan
+
+      - name: 🚀 Apply
+        working-directory: ./dev/excute
+        run: |
+          tofu apply -auto-approve tfplan || {
             echo "⚠️ Resource sudah ada — lanjutkan deployment..."
           }
 
-      - name: ✅ Verify Deployment
+      - name: ✅ Verify
         continue-on-error: true
         run: |
-          echo "🔍 Mengecek namespace dan pods..."
           kubectl get ns
-          echo ""
           kubectl get pods -A
-          echo ""
-          echo "✅ Verifikasi selesai!"
