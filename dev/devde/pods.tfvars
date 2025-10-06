@@ -1,4 +1,4 @@
-kubedeploy = "nginx-iac"
+kubedeploy = "nginx-minikube"
 img-app    = "nginx"
 port	   = 80
 
