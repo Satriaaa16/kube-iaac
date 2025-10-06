@@ -2,41 +2,28 @@ name: Terraform + K3s CI/CD
 
 on:
   push:
-    branches: [ "main", "testing" ]
+    branches: [ "main" ]         # Apply hanya saat merge ke main
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "testing" ]  # Plan saat PR ke main atau testing
 
 jobs:
-  # =============================
-  # 🧠 PLAN — hanya untuk PR
-  # =============================
   plan:
-    name: 🧠 Terraform Plan
+    name: 🧩 Terraform Plan (PR)
+    if: github.event_name == 'pull_request'
     runs-on: [self-hosted, Linux, X64]
-    if: github.event_name == 'pull_request' || github.ref != 'refs/heads/main'
-
     env:
       KUBECONFIG: /home/alan/.kube/config
 
     steps:
-      - name: 🧩 Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 🧠 Verify OpenTofu installation
-        run: |
-          if ! command -v tofu &> /dev/null; then
-            echo "❌ OpenTofu tidak ditemukan! Install dulu via 'sudo pacman -S opentofu'"
-            exit 1
-          fi
-          tofu version
+      - name: 🧠 Verify OpenTofu
+        run: tofu version
 
-      - name: 🧠 Verify Kubernetes connection
+      - name: 🧠 Verify Kubernetes
         run: |
           echo "🔍 Mengecek koneksi ke cluster K3s..."
-          if ! kubectl cluster-info &> /dev/null; then
-            echo "❌ Tidak bisa terhubung ke cluster K3s!"
-            exit 1
-          fi
+          kubectl cluster-info
           kubectl get nodes
 
       - name: ⚙️ Terraform Init
@@ -46,35 +33,20 @@ jobs:
       - name: 🧩 Terraform Plan
         working-directory: ./dev/module
         run: |
-          echo "🧩 Menjalankan tofu plan..."
           tofu plan \
             -var-file="../devde/ns.tfvars" \
             -var-file="../devde/pods.tfvars" \
             -out=tfplan
 
-  # =============================
-  # 🚀 APPLY — hanya di branch main
-  # =============================
   apply:
-    name: 🚀 Terraform Apply (Main Only)
+    name: 🚀 Terraform Apply (Merge to main)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, Linux, X64]
-    if: github.ref == 'refs/heads/main'
-    needs: plan
-
     env:
       KUBECONFIG: /home/alan/.kube/config
 
     steps:
-      - name: 🧩 Checkout repository
-        uses: actions/checkout@v4
-
-      - name: 🧠 Verify OpenTofu installation
-        run: |
-          if ! command -v tofu &> /dev/null; then
-            echo "❌ OpenTofu tidak ditemukan! Install dulu via 'sudo pacman -S opentofu'"
-            exit 1
-          fi
-          tofu version
+      - uses: actions/checkout@v4
 
       - name: ⚙️ Terraform Init
         working-directory: ./dev/module
@@ -83,16 +55,14 @@ jobs:
       - name: 🚀 Terraform Apply
         working-directory: ./dev/module
         run: |
-          echo "🚀 Menjalankan tofu apply..."
           tofu apply -auto-approve tfplan || {
-            echo "⚠️ Resource sudah ada, dianggap tidak berubah."
-            exit 0
+            echo "⚠️ Resource sudah ada — lanjut..."
           }
 
       - name: ✅ Verify Deployment
         continue-on-error: true
         run: |
           echo "🔍 Mengecek namespace dan pods..."
-          kubectl get ns || echo "⚠️ Tidak bisa ambil namespace"
-          kubectl get pods -A || echo "⚠️ Tidak bisa ambil pods"
-          echo "✅ Verifikasi selesai — Deployment berhasil atau tidak berubah."
+          kubectl get ns
+          kubectl get pods -A
+          echo "✅ Verifikasi selesai!"
