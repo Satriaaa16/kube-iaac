@@ -1,7 +1,7 @@
-kubedeploy = "walawe-edit"
+kubedeploy = "walawe-1"
 img-app    = "nginx"
 port	   = 8080
 
 # readiness probe
   # request
-cpu-req="15m"
+cpu-req="17m"
