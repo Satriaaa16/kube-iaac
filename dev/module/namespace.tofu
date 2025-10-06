@@ -1,7 +1,7 @@
-resource "kubernetes_namespace" "namespace-input-tfvars" {
- metadata{
-   name          = var.ns
- }
-}
+#resource "kubernetes_namespace" "namespace-input-tfvars" {
+# metadata{
+#   name          = var.ns
+# }
+#}
 
 
