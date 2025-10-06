@@ -1,4 +1,4 @@
-name: Terraform + K3s CI
+name: Terraform + K3s CI/CD
 
 on:
   push:
@@ -7,11 +7,16 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  # =============================
+  # 🧠 PLAN — hanya untuk PR
+  # =============================
+  plan:
+    name: 🧠 Terraform Plan
     runs-on: [self-hosted, Linux, X64]
+    if: github.event_name == 'pull_request' || github.ref != 'refs/heads/main'
 
     env:
-      KUBECONFIG: /home/alan/.kube/config   # sesuaikan lokasi kubeconfig kamu
+      KUBECONFIG: /home/alan/.kube/config
 
     steps:
       - name: 🧩 Checkout repository
@@ -36,37 +41,58 @@ jobs:
 
       - name: ⚙️ Terraform Init
         working-directory: ./dev/module
-        run: |
-          tofu init -input=false
+        run: tofu init -input=false
 
       - name: 🧩 Terraform Plan
         working-directory: ./dev/module
         run: |
+          echo "🧩 Menjalankan tofu plan..."
           tofu plan \
             -var-file="../devde/ns.tfvars" \
             -var-file="../devde/pods.tfvars" \
             -out=tfplan
 
+  # =============================
+  # 🚀 APPLY — hanya di branch main
+  # =============================
+  apply:
+    name: 🚀 Terraform Apply (Main Only)
+    runs-on: [self-hosted, Linux, X64]
+    if: github.ref == 'refs/heads/main'
+    needs: plan
+
+    env:
+      KUBECONFIG: /home/alan/.kube/config
+
+    steps:
+      - name: 🧩 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🧠 Verify OpenTofu installation
+        run: |
+          if ! command -v tofu &> /dev/null; then
+            echo "❌ OpenTofu tidak ditemukan! Install dulu via 'sudo pacman -S opentofu'"
+            exit 1
+          fi
+          tofu version
+
+      - name: ⚙️ Terraform Init
+        working-directory: ./dev/module
+        run: tofu init -input=false
+
       - name: 🚀 Terraform Apply
-        if: success()
-        working-directory: ./dev/module     # ← HARUS sama dengan folder tempat tfplan dibuat
+        working-directory: ./dev/module
         run: |
           echo "🚀 Menjalankan tofu apply..."
           tofu apply -auto-approve tfplan || {
-            echo "⚠️ Beberapa resource mungkin sudah ada, melanjutkan..."
+            echo "⚠️ Resource sudah ada, dianggap tidak berubah."
+            exit 0
           }
 
       - name: ✅ Verify Deployment
         continue-on-error: true
         run: |
           echo "🔍 Mengecek namespace dan pods..."
-
-          echo "➡️ Namespace yang ada:"
-          kubectl get ns || echo "⚠️ Gagal ambil namespace (abaikan jika sudah ada)"
-
-          echo ""
-          echo "➡️ Daftar pods di semua namespace:"
-          kubectl get pods -A || echo "⚠️ Gagal ambil pods (abaikan jika sudah ada)"
-
-          echo ""
-          echo "✅ Verifikasi selesai — jika resource sudah ada, deployment dianggap berhasil."
+          kubectl get ns || echo "⚠️ Tidak bisa ambil namespace"
+          kubectl get pods -A || echo "⚠️ Tidak bisa ambil pods"
+          echo "✅ Verifikasi selesai — Deployment berhasil atau tidak berubah."
