@@ -23,3 +23,7 @@ variable "port" {
 variable "cpu-req" {
  type = string
 } 
+
+variable "memo-req" {
+ type = string
+}

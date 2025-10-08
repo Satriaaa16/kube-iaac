@@ -7,4 +7,5 @@ module "config-utama" {
    img-app= var.img-app
    port   = var.port
    cpu-req= var.cpu-req
+   memo-req= var.memo-req
 }

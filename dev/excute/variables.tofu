@@ -3,7 +3,7 @@
 #  type        = string
 #}
 
-
+#deployment
 variable "kubedeploy" {
   type = string
   default = "nama aplikasi"
@@ -27,4 +27,9 @@ variable "port" {
 
 variable "cpu-req" {
  type    = string
+}
+
+
+variable "memo-req" {
+ type	 = string
 }
