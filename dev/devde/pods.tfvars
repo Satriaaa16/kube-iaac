@@ -5,3 +5,5 @@ port	   = 80
 # readiness probe
   # request
 cpu-req="25m"
+memo-req="20Mi"
+

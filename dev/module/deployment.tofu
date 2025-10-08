@@ -34,7 +34,7 @@ resource "kubernetes_deployment" "tfvars-input" {
             }
             requests = {
               cpu    = var.cpu-req
-              memory = "50Mi"
+              memory = var.memo-req
             }
           }
 
