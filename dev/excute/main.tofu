@@ -8,4 +8,6 @@ module "config-utama" {
    port   = var.port
    cpu-req= var.cpu-req
    memo-req= var.memo-req
+   cpu-limit= var.cpu-limit
+   memo-limit=var.memo-limit
 }
