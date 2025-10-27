@@ -29,8 +29,8 @@ resource "kubernetes_deployment" "tfvars-input" {
 
           resources {
             limits = {
-              cpu    = "0.5"
-              memory = "512Mi"
+              cpu    = var.cpu-limit
+              memory = var.memo-limit
             }
             requests = {
               cpu    = var.cpu-req

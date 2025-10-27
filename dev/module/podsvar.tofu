@@ -27,3 +27,13 @@ variable "cpu-req" {
 variable "memo-req" {
  type = string
 }
+
+# limit
+
+variable "cpu-limit" {
+ type = string
+}
+
+variable "memo-limit" {
+ type = string
+}
