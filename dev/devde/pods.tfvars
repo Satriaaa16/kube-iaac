@@ -1,4 +1,4 @@
-kubedeploy = "test-readiness"
+kubedeploy = "test-svc"
 img-app    = "nginx"
 port	   = 80
 
