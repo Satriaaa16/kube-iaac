@@ -20,7 +20,6 @@ variable "img-app" {
   default = "image aplikasi"
 }
 
-
 variable "port" {
  default = "number port"
 }
@@ -34,10 +33,31 @@ variable "memo-req" {
  type	 = string
 }
 
+
+
 variable "cpu-limit" {
  type    = string
 }
 
 variable "memo-limit" {
  type   = string
+}
+
+
+variable "svc-app" {
+ type = string
+}
+
+
+variable "tarport" {
+ type = string
+}
+
+variable "typelb" {
+ type = string
+}
+
+
+variable "selectapp" {
+ type = string
 }

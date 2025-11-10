@@ -10,4 +10,11 @@ module "config-utama" {
    memo-req= var.memo-req
    cpu-limit= var.cpu-limit
    memo-limit=var.memo-limit
+
+ # service
+
+ svc-app = var.svc-app
+   selectapp = var.selectapp
+   tarport   = var.tarport
+   typelb    = var.typelb
 }
