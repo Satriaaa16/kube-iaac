@@ -42,6 +42,7 @@ jobs:
           tofu init -input=false
           tofu plan -input=false \
             -var-file="../devde/pods.tfvars" \
+            -var-file="../devde/svc.tfvars" \
             -out=tfplan
 
       - name: 🚀 Apply
