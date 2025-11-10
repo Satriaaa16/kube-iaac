@@ -1,4 +1,4 @@
 svc-app="nginx-svc"
-selectapp="nginx"
+selectapp="iac-nginx"
 tarport="8080"
 typelb="NodePort"

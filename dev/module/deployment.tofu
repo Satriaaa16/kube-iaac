@@ -2,7 +2,7 @@ resource "kubernetes_deployment" "tfvars-input" {
   metadata {
     name = var.kubedeploy
     labels = {
-      test = "MyExampleApp"
+      app = var.applabel
     }
   }
 
@@ -11,14 +11,14 @@ resource "kubernetes_deployment" "tfvars-input" {
 
     selector {
       match_labels = {
-        test = "MyExampleApp"
+        app = var.applabel
       }
     }
 
     template {
       metadata {
         labels = {
-          test = "MyExampleApp"
+          app = var.applabel
         }
       }
 

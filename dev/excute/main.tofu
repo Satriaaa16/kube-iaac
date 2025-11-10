@@ -5,6 +5,7 @@ module "config-utama" {
  kubedeploy = var.kubedeploy
    labels = var.labels
    img-app= var.img-app
+   applabel = var.applabel
    port   = var.port
    cpu-req= var.cpu-req
    memo-req= var.memo-req

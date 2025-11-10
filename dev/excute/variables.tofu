@@ -15,6 +15,9 @@ variable "labels" {
   default = "aplikasi point"
 }
 
+variable "applabel" {
+ type = string
+}
 
 variable "img-app" {
   default = "image aplikasi"
