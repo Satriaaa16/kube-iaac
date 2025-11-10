@@ -1,4 +1,4 @@
 svc-app="nginx-svc"
 selectapp="iac-nginx"
-tarport="8080"
+tarport="80"
 typelb="NodePort"
