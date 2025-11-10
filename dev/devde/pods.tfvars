@@ -1,6 +1,7 @@
 kubedeploy = "test-svc"
 img-app    = "nginx"
 port	   = 80
+applabel   = "iac-nginx"
 
 # readiness probe
   # request
